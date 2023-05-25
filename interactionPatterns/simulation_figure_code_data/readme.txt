@@ -1,0 +1,1 @@
+This directory contains code necessary to perform the toxicity and tradeoff simulation shown in the SI. 

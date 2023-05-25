@@ -1,0 +1,1 @@
+Code and data to plot OD and metabolite dynamics for the enrichment experiment shown in Fig. 2

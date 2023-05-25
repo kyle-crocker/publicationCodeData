@@ -1,0 +1,42 @@
+Testname: KC_OD600_24well
+Date: 6/17/2022  Time: 12:26:24 PM
+ID1: crm_predict_norm3  ID2:   ID3: 
+No. of Channels / Multichromatics: 1
+No. of Cycles: 1
+Configuration: Absorbance
+Used wavelengths, gain values and path length correction factor:
+  1: 600nm                                          0/0     1.0593
+  2: -                                              
+  3: -                                              
+  4: -                                              
+  5: -                                              
+Focal height [mm]: -
+
+Chromatic / Channel: 1
+Cycle: 1
+T[°C]: 30.1
+A01:         -
+A02:  1.171400
+A03:  1.130100
+A04:         -
+A05:         -
+A06:         -
+B01:         -
+B02:         -
+B03:         -
+B04:   .092500
+B05:  1.117100
+B06:  1.133900
+C01:         -
+C02:         -
+C03:         -
+C04:   .097800
+C05:         -
+C06:         -
+D01:         -
+D02:         -
+D03:         -
+D04:         -
+D05:         -
+D06:         -
+

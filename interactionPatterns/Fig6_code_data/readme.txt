@@ -1,0 +1,1 @@
+This directory contains code and data necessary to reproduce Fig. 6. 

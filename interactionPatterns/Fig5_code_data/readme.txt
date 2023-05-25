@@ -1,0 +1,1 @@
+This directory contains code and data necessary to generate Fig. 5 E-F and the associated SI figure. See "Fig4_code_data" for Fig 5 A-B. 

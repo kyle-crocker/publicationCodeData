@@ -1,0 +1,162 @@
+###################################################
+######### load relevant modules ##################
+###################################################
+import sys
+sys.path.append('functions/')
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import bmgdata as bd
+import glob
+from matplotlib.pyplot import cm
+import warnings
+
+
+###################################################
+######### format plot ##################
+###################################################
+plt.rcParams['svg.fonttype'] = 'none'
+plt.rcParams['axes.linewidth'] = 1
+plt.rcParams['xtick.labelsize'] = 7
+plt.rcParams['text.usetex'] = False
+plt.rcParams['font.size'] = 8
+dot_size_OD = 3
+dot_size_A = 5
+dot_size_I = 5
+linewidth = 2
+alpha = 0.5
+
+pHs = [6, 7.3]   #pH values
+filenames = sorted(glob.glob('data/KC_OD600_*_MP3_c*_OD_endpoint_*.csv')) #load OD files
+
+#import metadata
+meta_filename = 'data/plate1_metadata.csv'  
+meta = pd.read_csv(meta_filename,index_col=0).dropna(how='all')  
+
+#get RH Nap+ initial relative abundances, use as proxy for strains: rhizo_f0s = 0 => PD Nar+, rhizo_f0s = 1 => RH Nap+
+rhizo_f0s = np.setdiff1d(np.unique(meta["rhizo_f0"]),['O2_control', 'blank', 'presumed_blank'])
+
+#construct OD matrices 
+ODs = np.empty((len(filenames), len(pHs), len(rhizo_f0s), 4))
+ODs[:] = np.nan
+ODs_avg = np.empty((len(filenames), len(pHs), len(rhizo_f0s)))
+ODs_avg[:] = np.nan
+OD_stds = np.empty((len(filenames), len(pHs), len(rhizo_f0s)))
+OD_stds[:] = np.nan
+
+#start at cycle 1
+cycle = 1
+
+for filename in filenames:
+    #load OD data for current cycle 
+    OD_data_frame = bd.read_abs_endpoint(filename)
+    OD_data_frame = OD_data_frame[OD_data_frame.index.isin(meta.index)]
+
+    #find blanks
+    blank_idx = (meta["rhizo_f0"] == "blank")
+    avg_blank_ODs = np.nanmean(OD_data_frame[blank_idx])
+
+    #set OD values for each condition by looping over pH and strains
+    for i in range(len(pHs)):
+        for j in range(len(rhizo_f0s)):
+            idx = (meta["pH"] == pHs[i]) & (meta["rhizo_f0"] == str(rhizo_f0s[j]))
+            OD_val = np.nanmean(OD_data_frame[idx]) - avg_blank_ODs
+            OD_vals = OD_data_frame[idx] - avg_blank_ODs
+            OD_vals = OD_vals.values
+            OD_std = np.std(OD_data_frame[idx]) #standard deviation
+
+            #loop across replicates
+            for m in range(len(OD_vals[:])):  
+                ODs[cycle-1,i,j,m] = OD_vals[m]
+            ODs_avg[cycle-1,i,j] = OD_val
+            OD_stds[cycle-1,i,j] = OD_std
+    cycle = cycle + 1 #iterate cycle
+
+
+
+#make subfigures
+fig, axs = plt.subplots(3,2,figsize=(6,3.75), sharex = True, sharey = 'row')
+
+#set marker style
+A_marker = 'o'
+I_marker = 'o'
+
+cycle = 1
+num_cycles = 3
+last_t = 0
+t_to_add = 0
+last_ts = np.zeros(num_cycles)
+
+#plot metabolite dynamics across cycles
+for k in range(num_cycles):
+    last_t = last_t + t_to_add
+    met_file = 'data/cycle'+str(cycle)+'_metabolite_dynamics.pkl'
+    all_experiments = pd.read_pickle(met_file)
+
+    #loop through experiments
+    for experiments in all_experiments:
+        for experiment in experiments:
+            #loop over pH values
+            for i in range(len(pHs)):
+                #loop over strains
+                for j in range(len(rhizo_f0s)):
+                    #check if current experiment matches the given pH and strain
+                    if experiment.f0_pseudo == rhizo_f0s[j]:
+                        if experiment.pH == pHs[i]:                            
+                            #use blue for PD Nar+ and orange for RH Nap+
+                            if float(rhizo_f0s[j]) == 0:
+                                color_val = 'tab:blue'
+                            elif float(rhizo_f0s[j]) == 1:
+                                color_val = 'tab:orange'
+                                
+                            #draw a line through the mean
+                            axs[1][i].plot(last_t+experiment.t,np.nanmean(experiment.A, axis=0),'-', color = color_val, linewidth = linewidth, alpha = alpha)
+                            axs[2][i].plot(last_t+experiment.t,np.nanmean(experiment.I, axis=0), '-',color = color_val, linewidth = linewidth, alpha = alpha)
+
+                            #plot each replicate
+                            for m in range(len(experiment.A)):
+                                axs[1][i].scatter(last_t+experiment.t,experiment.A[m],  color = color_val, s = dot_size_A, marker = A_marker)
+                                axs[2][i].scatter(last_t+experiment.t,experiment.I[m],  color = color_val, s = dot_size_I, marker = I_marker)
+                            axs[1][0].set_ylabel('NO3 [mM]')
+                            axs[2][0].set_ylabel('NO2 [mM]')
+                            t_to_add = experiment.t[-1]
+                            axs[1][i].set_ylim([-0.2, 2.7])
+                            axs[2][i].set_ylim([-0.2, 2.7])
+
+    last_ts[k] = last_t+t_to_add #add total time from last experiment
+    cycle=cycle+1  #iterate cycles
+
+
+for i in range(len(pHs)):
+    for j in range(len(rhizo_f0s)):
+        if float(rhizo_f0s[j]) == 0:
+            color_val = 'tab:blue'
+            label = 'PD Nar+'
+            axs[0][i].plot(last_ts, ODs_avg[:,i,j],  color = color_val, linewidth = linewidth, alpha = alpha, label = label)
+            for k in range(4):
+                axs[0][i].scatter(last_ts, ODs[:,i,j,k],  color = color_val, linewidth = linewidth, alpha = 1, label = label, s = dot_size_OD)
+            axs[0][i].set_title('pH 6')
+        elif float(rhizo_f0s[j]) == 1:
+            color_val = 'tab:orange'
+            label = 'RH Nap+'
+            axs[0][i].plot(last_ts, ODs_avg[:,i,j],  color = color_val, linewidth = linewidth, alpha = alpha, label = label)
+            for k in range(4):
+                axs[0][i].scatter(last_ts, ODs[:,i,j,k],  color = color_val, linewidth = linewidth, alpha = 1, label = label, s = dot_size_OD)
+            axs[0][0].set_ylabel('Endpt. biomass [OD600]')
+
+axs[0][0].set_title('pH 6', weight = 'bold')
+axs[0][1].set_title('pH 7.3', weight = 'bold')
+
+
+plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.95, wspace=0.03, hspace=0.05)
+
+fig.add_subplot(111, frameon=False)
+# hide tick and tick label of the big axes
+plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+plt.grid(False)
+plt.xlabel("t [h]", fontsize = 8)
+plt.savefig('fig_3_point_cloud_scale_new_data.svg')
+plt.savefig('fig_3_point_cloud_scale_new_data.png')
+plt.show()
+
+
