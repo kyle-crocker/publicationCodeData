@@ -1,1 +1,1 @@
-This directory contains code and data necessary to generate Fig. 4 and Fig. 5 A-B. 
+This directory contains code and data necessary to generate Fig. 4 and Fig. 5 A-B. Note that data analysis for the mortality rate experiments are contained in FigSx_killing_curve_nitrite_dynamics/full.ipynb, and that fitting code is contained in fit_and_predict_code_data/CRM_predict.ipynb. 

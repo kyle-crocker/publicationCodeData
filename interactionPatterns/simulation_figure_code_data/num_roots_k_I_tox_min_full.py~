@@ -88,9 +88,7 @@ value = -1
 
 masked_array = np.ma.masked_where(num_roots == value, num_roots)
 
-
-#cmap = mpl.cm.Purples
-#cmap.set_bad(color='tab:orange')
+#set up colormap
 cmap = mpl.colors.ListedColormap(['purple', 'tab:green', 'tab:orange', 'tab:red', 'cyan', 'maroon','pink' ])
 bounds = [-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5]
 norm = mpl.colors.BoundaryNorm(bounds, cmap.N)

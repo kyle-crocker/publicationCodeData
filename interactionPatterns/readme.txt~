@@ -1,0 +1,9 @@
+This repository contains code and data associated with the manuscript entitled "Genomic patterns in the global soil microbiome emerge from microbial interactions" by Kyle Crocker, Milena Chakraverti-Wuerthwein, Zeqian Li, Madhav Mani, Karna Gowda, Seppe Kuehn. 
+
+Code uses Python version 3.9.1. Matlab code uses version 2017b. 
+
+Code is commented to provide instructions for its use. 
+
+Expected output of the code is the indicated figure in the manuscript. 
+
+All scripts should run in < 1 minute except for fit_and_predict_code_data/CRM_predict.ipynb, which should run in < 15 minutes, and simulation_figure_code_data/num_roots_k_I_tox_min_full.py, which depends on the command line arguments. Should take < 2 hours to reproduce Fig. S9. 

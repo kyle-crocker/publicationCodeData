@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 #define command line parameters
-#to reproduce Fig. 7 use:
+#to reproduce Fig. S9 use:
 #python num_roots_k_I_tox_min_full.py 1.25 2.0 20 2 5 0.1 0.5 20 10 20 12 0.1 
 print('usage is python num_roots_k_I_tox_min.py kmin kmax num_ks rA_thresh f Itox_min_min Itox_min_max num_Itox_mins Itox_max n_strains n_cycles rd_max')
 
@@ -54,7 +54,7 @@ I_tox_min_max = float(sys.argv[7])
 num_I_tox_min = int(sys.argv[8])
 I_tox_mins = np.linspace(I_tox_min_min, I_tox_min_max, num_I_tox_min)
 
-#for sake of simulation set I_tox_max to 10 to XXX FIX  
+#for sake of simulation set I_tox_max to 10   
 I_tox_max = float(sys.argv[9])
 
 #number of strains

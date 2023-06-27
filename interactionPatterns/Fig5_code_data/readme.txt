@@ -1,1 +1,1 @@
-This directory contains code and data necessary to generate Fig. 5 E-F and the associated SI figure. See "Fig4_code_data" for Fig 5 A-B. 
+This directory contains code and data necessary to generate Fig. 5 E-F and the associated SI figure. See "Fig4_code_data" for Fig 5 A-B.  Note that relative abundance experiment analysis is given in FigSx_rel_ab_fit_code_data/code_and_description.ipynb 
